@@ -27,6 +27,11 @@
  *   for the specific language governing permissions and limitations under the License.
  *
  *****************************************************************************************************************/
+
+/**
+* Notes, updated phyicalgraph to hubitat
+* Issue with line 1163
+**/
 metadata {
     definition (name: "GreenWave PowerNode (Single) Advanced", namespace: "codersaur", author: "David Lomas") {
         capability "Actuator"
