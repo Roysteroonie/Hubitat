@@ -50,7 +50,7 @@ metadata {
 	capability "Refresh"
 	capability "Temperature Measurement"
 	capability "Sensor"
-        
+		
 	attribute "cpuFrequency", "number"       
 	attribute "freeMemory", "number"
 	attribute "freeMemoryPercent", "number"
@@ -85,12 +85,12 @@ def installed() {
 
 // App Version   *********************************************************************************
 def setVersion(){
-    state.Version = "1.0.5"
-    state.InternalName = "RaspberryPiStats"
+	state.Version = "1.0.5"
+	state.InternalName = "RaspberryPiStats"
 
-    sendEvent(name: "DriverAuthor", value: "sgrayban")
-    sendEvent(name: "DriverVersion", value: state.Version)
-    sendEvent(name: "DriverStatus", value: state.Status)
+	sendEvent(name: "DriverAuthor", value: "sgrayban")
+	sendEvent(name: "DriverVersion", value: state.Version)
+	sendEvent(name: "DriverStatus", value: state.Status)
 }
 
 def updated() {
@@ -123,66 +123,66 @@ def logsOff(){
 
 // parse events into attributes
 def parse(description) {
-    logDebug "Parsing '${description}'"
+	logDebug "Parsing '${description}'"
 	
-    def msg = parseLanMessage(description)
-    def headerString = msg.header
-    def bodyString   = msg.body
+	def msg = parseLanMessage(description)
+	def headerString = msg.header
+	def bodyString   = msg.body
 
-    logDebug "received body:\n${bodyString}"
-    
-    if(bodyString.trim() == "ok")
+	logDebug "received body:\n${bodyString}"
+	
+	if(bodyString.trim() == "ok")
 	return
-    
-    def json = null;
-    try{
+	
+	def json = null;
+	try{
 	json = new groovy.json.JsonSlurper().parseText(bodyString)
-        logDebug "${json}"
-        
-        if(json == null){
+		logDebug "${json}"
+		
+		if(json == null){
 	logDebug "body object not parsed"
-            return
-        }
-    }
-    catch(e){
+			return
+		}
+	}
+	catch(e){
 	log.error("Failed to parse json e = ${e}")
-        return
-    }
+		return
+	}
 
-    logDebug "JSON '${json}'"
-    
-    if (json.containsKey("cpuTemperature")) {
+	logDebug "JSON '${json}'"
+	
+	if (json.containsKey("cpuTemperature")) {
 	if (getTemperatureScale() == "C") {
 		sendEvent(name: "temperature", value: json.cpuTemperature)
 	} else {
 	def fahrenheit = json.cpuTemperature * 9 / 5 + 32
 		sendEvent(name: "temperature", value: fahrenheit)
-        }
-    }
-    if (json.containsKey("freeMemory")) {
+		}
+	}
+	if (json.containsKey("freeMemory")) {
 		sendEvent(name: "freeMemory", value: (json.freeMemory/1024/1024).toDouble().round(2))
 	if (json.containsKey("totalMemory")) {
 		sendEvent(name: "freeMemoryPercent", value: (json.freeMemory/json.totalMemory*100).toDouble().round())
 	}
-    }
-    if (json.containsKey("cpuCoreVoltage")) {
+	}
+	if (json.containsKey("cpuCoreVoltage")) {
 	sendEvent(name: "cpuCoreVoltage", value: json.cpuCoreVoltage)
-    }
-    if (json.containsKey("modelName")) {
+	}
+	if (json.containsKey("modelName")) {
 	sendEvent(name: "modelName", value: json.modelName)
-    }
-    if (json.containsKey("boardType")) {
+	}
+	if (json.containsKey("boardType")) {
 	sendEvent(name: "boardType", value: json.boardType)
-    }
-    if (json.containsKey("javaVersion")) {
+	}
+	if (json.containsKey("javaVersion")) {
 	sendEvent(name: "javaVersion", value: json.javaVersion)
-    }
-    if (json.containsKey("hostname")) {
+	}
+	if (json.containsKey("hostname")) {
 	sendEvent(name: "hostname", value: json.hostname)
-    }
-    if (json.containsKey("serialNumber")) {
+	}
+	if (json.containsKey("serialNumber")) {
 	sendEvent(name: "serialNumber", value: json.serialNumber)
-    }
+	}
 }
 
 // handle commands
@@ -190,13 +190,13 @@ def parse(description) {
 def poll() {
 	if (locale == "UK") {
 	if (debugOutput) log.info "Get last UK Date DD/MM/YYYY"
-    state.LastRefresh = new Date().format("d/MM/YYYY \n HH:mm:ss", location.timeZone)
-    sendEvent(name: "LastRefresh", value: state.LastRefresh, descriptionText: "Last refresh performed")
+	state.LastRefresh = new Date().format("d/MM/YYYY \n HH:mm:ss", location.timeZone)
+	sendEvent(name: "LastRefresh", value: state.LastRefresh, descriptionText: "Last refresh performed")
 	} 
 	if (locale == "US") {
 	if (debugOutput) log.info "Get last US Date MM/DD/YYYY"
-    state.LastRefresh = new Date().format("MM/d/YYYY \n HH:mm:ss", location.timeZone)
-    sendEvent(name: "LastRefresh", value: state.LastRefresh, descriptionText: "Last refresh performed")
+	state.LastRefresh = new Date().format("MM/d/YYYY \n HH:mm:ss", location.timeZone)
+	sendEvent(name: "LastRefresh", value: state.LastRefresh, descriptionText: "Last refresh performed")
 	}
 	if (txtEnable) log.info "Executing 'poll'" //RK
 	getPiInfo()
@@ -205,13 +205,13 @@ def poll() {
 def refresh() {
 	if (locale == "UK") {
 	if (debugOutput) log.info "Get last UK Date DD/MM/YYYY"
-    state.LastRefresh = new Date().format("d/MM/YYYY \n HH:mm:ss", location.timeZone)
-    sendEvent(name: "LastRefresh", value: state.LastRefresh, descriptionText: "Last refresh performed")
+	state.LastRefresh = new Date().format("d/MM/YYYY \n HH:mm:ss", location.timeZone)
+	sendEvent(name: "LastRefresh", value: state.LastRefresh, descriptionText: "Last refresh performed")
 	} 
 	if (locale == "US") {
 	if (debugOutput) log.info "Get last US Date MM/DD/YYYY"
-    state.LastRefresh = new Date().format("MM/d/YYYY \n HH:mm:ss", location.timeZone)
-    sendEvent(name: "LastRefresh", value: state.LastRefresh, descriptionText: "Last refresh performed")
+	state.LastRefresh = new Date().format("MM/d/YYYY \n HH:mm:ss", location.timeZone)
+	sendEvent(name: "LastRefresh", value: state.LastRefresh, descriptionText: "Last refresh performed")
 	}
 	if (txtEnable) log.info "Executing 'manual refresh'" //RK
 	getPiInfo()
@@ -220,13 +220,13 @@ def refresh() {
 def autorefresh() {
 	if (locale == "UK") {
 	if (debugOutput) log.info "Get last UK Date DD/MM/YYYY"
-    state.LastRefresh = new Date().format("d/MM/YYYY \n HH:mm:ss", location.timeZone)
-    sendEvent(name: "LastRefresh", value: state.LastRefresh, descriptionText: "Last refresh performed")
+	state.LastRefresh = new Date().format("d/MM/YYYY \n HH:mm:ss", location.timeZone)
+	sendEvent(name: "LastRefresh", value: state.LastRefresh, descriptionText: "Last refresh performed")
 	} 
 	if (locale == "US") {
 	if (debugOutput) log.info "Get last US Date MM/DD/YYYY"
-    state.LastRefresh = new Date().format("MM/d/YYYY \n HH:mm:ss", location.timeZone)
-    sendEvent(name: "LastRefresh", value: state.LastRefresh, descriptionText: "Last refresh performed")
+	state.LastRefresh = new Date().format("MM/d/YYYY \n HH:mm:ss", location.timeZone)
+	sendEvent(name: "LastRefresh", value: state.LastRefresh, descriptionText: "Last refresh performed")
 	}
 	if (txtEnable) log.info "Executing 'auto refresh'" //RK
 	getPiInfo()
@@ -237,7 +237,7 @@ def autorefresh() {
 private getPiInfo() {
 	def iphex = convertIPtoHex(ip)
 	def porthex = convertPortToHex(port)
-    
+	
 	def uri = "/api/pi"
 	def headers=[:]
 	headers.put("HOST", "${ip}:${port}")
@@ -309,51 +309,51 @@ def version(){
 }
 
 def updatecheck(){
-    setVersion()
-     def paramsUD = [uri: "https://sgrayban.github.io/Hubitat-Public/version.json"]
-      try {
-            httpGet(paramsUD) { respUD ->
-                  //  log.warn " Version Checking - Response Data: ${respUD.data}"   // Troubleshooting Debug Code - Uncommenting this line should show the JSON response from your webserver
-                  def copyrightRead = (respUD.data.copyright)
-                  state.Copyright = copyrightRead
-                  def newVerRaw = (respUD.data.versions.Driver.(state.InternalName))
-                  def newVer = (respUD.data.versions.Driver.(state.InternalName).replace(".", ""))
-                  def currentVer = state.Version.replace(".", "")
-                  state.UpdateInfo = (respUD.data.versions.UpdateInfo.Driver.(state.InternalName))
-                  state.author = (respUD.data.author)
-                  if(newVer == "NLS"){
-                       state.Status = "<b>** This driver is no longer supported by $state.author  **</b>"       
-                       log.warn "** This driver is no longer supported by $state.author **"      
-                  }           
-                  else if(currentVer < newVer){
-                       state.Status = "<b>New Version Available (Version: $newVerRaw)</b>"
-                       log.warn "** There is a newer version of this driver available  (Version: $newVerRaw) **"
-                       log.warn "** $state.UpdateInfo **"
-                 } 
-                 else if(currentVer > newVer){
-                       state.Status = "<b>You are using a Test version of this Driver (Version: $newVerRaw)</b>"
-                 }
-                 else{ 
-                     state.Status = "Current"
-                     log.info "You are using the current version of this driver"
-                 }
-            } // httpGet
-      } // try
+	setVersion()
+	 def paramsUD = [uri: "https://sgrayban.github.io/Hubitat-Public/version.json"]
+	  try {
+			httpGet(paramsUD) { respUD ->
+				  //  log.warn " Version Checking - Response Data: ${respUD.data}"   // Troubleshooting Debug Code - Uncommenting this line should show the JSON response from your webserver
+				  def copyrightRead = (respUD.data.copyright)
+				  state.Copyright = copyrightRead
+				  def newVerRaw = (respUD.data.versions.Driver.(state.InternalName))
+				  def newVer = (respUD.data.versions.Driver.(state.InternalName).replace(".", ""))
+				  def currentVer = state.Version.replace(".", "")
+				  state.UpdateInfo = (respUD.data.versions.UpdateInfo.Driver.(state.InternalName))
+				  state.author = (respUD.data.author)
+				  if(newVer == "NLS"){
+					   state.Status = "<b>** This driver is no longer supported by $state.author  **</b>"       
+					   log.warn "** This driver is no longer supported by $state.author **"      
+				  }           
+				  else if(currentVer < newVer){
+					   state.Status = "<b>New Version Available (Version: $newVerRaw)</b>"
+					   log.warn "** There is a newer version of this driver available  (Version: $newVerRaw) **"
+					   log.warn "** $state.UpdateInfo **"
+				 } 
+				 else if(currentVer > newVer){
+					   state.Status = "<b>You are using a Test version of this Driver (Version: $newVerRaw)</b>"
+				 }
+				 else{ 
+					 state.Status = "Current"
+					 log.info "You are using the current version of this driver"
+				 }
+			} // httpGet
+	  } // try
 
-      catch (e) {
-           log.error "Something went wrong: CHECK THE JSON FILE AND IT'S URI -  $e"
-      }
+	  catch (e) {
+		   log.error "Something went wrong: CHECK THE JSON FILE AND IT'S URI -  $e"
+	  }
 
-      if(state.Status == "Current"){
-           state.UpdateInfo = "Up to date"
-           sendEvent(name: "DriverUpdate", value: state.UpdateInfo)
-           sendEvent(name: "DriverStatus", value: state.Status)
-      }
-      else {
-           sendEvent(name: "DriverUpdate", value: state.UpdateInfo)
-           sendEvent(name: "DriverStatus", value: state.Status)
-      }
+	  if(state.Status == "Current"){
+		   state.UpdateInfo = "Up to date"
+		   sendEvent(name: "DriverUpdate", value: state.UpdateInfo)
+		   sendEvent(name: "DriverStatus", value: state.Status)
+	  }
+	  else {
+		   sendEvent(name: "DriverUpdate", value: state.UpdateInfo)
+		   sendEvent(name: "DriverStatus", value: state.Status)
+	  }
 
-      sendEvent(name: "DriverAuthor", value: "sgrayban")
-      sendEvent(name: "DriverVersion", value: state.Version)
+	  sendEvent(name: "DriverAuthor", value: "sgrayban")
+	  sendEvent(name: "DriverVersion", value: state.Version)
 }
