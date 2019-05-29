@@ -29,7 +29,7 @@
  *  Updated for HE by @Royski 28/05/19
  *****************************************************************************************************************/
 metadata {
-    definition (name: "GreenWave PowerNode (Single) Advanced - HE", namespace: "codersaur", author: "David Lomas") {
+    definition (name: "GreenWave PowerNode (Single) Advanced - HE", namespace: "codersaur", author: "David Lomas", importUrl: "https://raw.githubusercontent.com/Roysteroonie/Hubitat/master/GreenWave%20PowerNode%20(Single)%20Advanced%20-%20HE.groovy") {
         capability "Actuator"
         capability "Switch"
         capability "Sensor"
