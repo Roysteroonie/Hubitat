@@ -122,18 +122,20 @@ def handleIkeaDimmerLevelEvent(descMap) {
 		// on/off command for the dimmer. Otherwise, we will treat this as off or on and setLevel.
 		if (descMap.data[0] == "00") {
 			results << createEvent(name: "switch", value: "off", isStateChange: true)
-			createEvent(name: "level", value: "0")
-            if (txtEnable) log.info "SWITCH OFF"
+			if (txtEnable) log.info "Switch Off"
+			// uncomment if you want to reset the level to Zero when Off
+			//results << createEvent(name: "level", value: "0", isStateChange: true)
+			//if (logEnable) log.debug "Set level to Zero"
 		} else if (descMap.data[0] == "FF") {
 			// The IKEA Dimmer sends 0xFF -- this is technically not to spec, but we will treat this as an "on"
 			if (device.currentValue("level") == 0) {
 			if (logEnable) log.debug "Level change ${level}"
 				results << createEvent(name: "level", value: DOUBLE_STEP)
 			}
-            if (txtEnable) log.info "SWITCH ON"
+            if (txtEnable) log.info "Switch On"
 			results << createEvent(name: "switch", value: "on", isStateChange: true)
 		} else {
-            if (txtEnable) log.info "SWITCH ON *"
+            if (txtEnable) log.info "Switch On *"
 			results << createEvent(name: "switch", value: "on", isStateChange: true)
 			// Handle the Zigbee level the same way as we would normally with the same code path -- command(Int?) doesn't matter right now
 			// The first byte is the level, the second two bytes are the rate -- we only care about the level right now.
@@ -166,15 +168,15 @@ def handleStepEvent(direction, descMap) {
 	def value = null
 
 	if (direction == LEVEL_DIRECTION_UP) {
-	if (txtEnable) log.info "level Up ${currentLevel.value}"
+	//if (txtEnable) log.info "level Up ${currentLevel.value}"
 		value = Math.min(currentLevel + DOUBLE_STEP, 100)
 	} else if (direction == LEVEL_DIRECTION_DOWN) {
-	if (txtEnable) log.info "level Down ${currentLevel.value}"
+	//if (txtEnable) log.info "level Down ${currentLevel.value}"
 		value = Math.max(currentLevel - DOUBLE_STEP, 0)
 	}
 
 	if (value != null) {
-		if (logEnable) log.debug "Step ${direction == LEVEL_DIRECTION_UP ? "up" : "down"} by $DOUBLE_STEP to $value"
+		if (txtEnable) log.info "Step ${direction == LEVEL_DIRECTION_UP ? "up" : "down"} by $DOUBLE_STEP to $value"
 
 		// don't change level if switch will be turning off
 		if (value == 0) {
