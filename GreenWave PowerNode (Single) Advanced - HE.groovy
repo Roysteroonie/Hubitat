@@ -39,16 +39,6 @@ metadata {
         capability "Polling"
         capability "Refresh"
 
-        // Custom (Virtual) Capabilities:
-        //capability "Fault"
-        //capability "Logging"
-        //capability "Protection"
-
-        // Standard Attributes:
-        attribute "switch", "enum", ["on", "off"]
-        attribute "power", "number"
-        attribute "energy", "number"
-
         // Custom Attributes:
         attribute "energyLastReset", "string"   // Last time Accumulated Engergy was reset.
         attribute "fault", "string"             // Indicates if the device has any faults. 'clear' if no active faults.
@@ -57,6 +47,7 @@ metadata {
         attribute "logMessage", "string"        // Important log messages.
         attribute "syncPending", "number"       // Number of config items that need to be synced with the physical device.
         attribute "wheelStatus", "enum", ["black","green","blue","red","yellow","violet","orange","aqua","pink","white"]
+		attribute "switch", "enum", ["on", "off"]
 
         // Display Attributes:
         // These are only required because the UI lacks number formatting and strips leading zeros.
@@ -236,7 +227,7 @@ def updated() {
         state.switchAllModeTarget = (settings.configSwitchAllMode) ? settings.configSwitchAllMode.toInteger() : 255
 
         // Update Parameter target values:
-        getParamsMd().findAll( { !it.readonly & (it.fwVersion <= state.fwVersion) } ).each { // Exclude readonly/newer parameters.
+        getParamsMd().findAll( { !it.readonly && (it.fwVersion <= state.fwVersion) } ).each { // Exclude readonly/newer parameters.
             state."paramTarget${it.id}" = settings."configParam${it.id}"?.toInteger()
         }
 
@@ -321,7 +312,7 @@ def zwaveEvent(hubitat.zwave.commands.basicv1.BasicReport cmd) {
     if (switchEvent.isStateChange) logger("Switch turned ${switchValue}.","info")
     result << switchEvent
 
-    if ( switchEvent.isStateChange & (switchValue == "on") && (state.autoOffTime > 0) ) {
+    if ( switchEvent.isStateChange && (switchValue == "on") && (state.autoOffTime > 0) ) {
         logger("Scheduling Auto-off in ${state.autoOffTime} seconds.","info")
         runIn(state.autoOffTime,autoOff)
     }
@@ -405,7 +396,7 @@ def zwaveEvent(hubitat.zwave.commands.switchbinaryv1.SwitchBinaryReport cmd) {
     if (switchEvent.isStateChange) logger("Switch turned ${switchValue}.","info")
     result << switchEvent
 
-    if ( switchEvent.isStateChange && (switchValue == "on") & (state.autoOffTime > 0) ) {
+    if ( switchEvent.isStateChange && (switchValue == "on") && (state.autoOffTime > 0) ) {
         logger("Scheduling Auto-off in ${state.autoOffTime} seconds.","info")
         runIn(state.autoOffTime,autoOff)
     }
@@ -498,20 +489,20 @@ def zwaveEvent(hubitat.zwave.commands.meterv3.MeterReport cmd) {
         case 1:  // Electric meter:
             switch (cmd.scale) {
                 case 0:  // Accumulated Energy (kWh):
-                    result << createEvent(name: "energy", value: cmd.scaledMeterValue, unit: "kWh", displayed: true)
-                    result << createEvent(name: "dispEnergy", value: String.format("%.2f",cmd.scaledMeterValue as BigDecimal) + " kWh", displayed: false)
+                    //result << createEvent(name: "energy", value: cmd.scaledMeterValue, unit: "kWh", displayed: true)
+                    result << createEvent(name: "dispEnergy", value: String.format("%.2f",cmd.scaledMeterValue as BigDecimal) + " kWh", unit: "kWh", displayed: true)
                     logger("New meter reading: Accumulated Energy: ${cmd.scaledMeterValue} kWh","info")
                     break
 
                 case 1:  // Accumulated Energy (kVAh):
-                    result << createEvent(name: "energy", value: cmd.scaledMeterValue, unit: "kVAh", displayed: true)
-                    result << createEvent(name: "dispEnergy", value: String.format("%.2f",cmd.scaledMeterValue as BigDecimal) + " kVAh", displayed: false)
+                    //result << createEvent(name: "energy", value: cmd.scaledMeterValue, unit: "kVAh", displayed: true)
+                    result << createEvent(name: "dispEnergy", value: String.format("%.2f",cmd.scaledMeterValue as BigDecimal) + " kVAh", unit: "kVAh", displayed: true)
                     logger("New meter reading: Accumulated Energy: ${cmd.scaledMeterValue} kVAh","info")
                     break
 
                 case 2:  // Instantaneous Power (Watts):
-                    result << createEvent(name: "power", value: cmd.scaledMeterValue, unit: "W", displayed: true)
-                    result << createEvent(name: "dispPower", value: String.format("%.1f",cmd.scaledMeterValue as BigDecimal) + " W", displayed: false)
+                    //result << createEvent(name: "power", value: cmd.scaledMeterValue, unit: "W", displayed: true)
+                    result << createEvent(name: "dispPower", value: String.format("%.1f",cmd.scaledMeterValue as BigDecimal) + " W", unit: "W", displayed: true)
                     logger("New meter reading: Instantaneous Power: ${cmd.scaledMeterValue} W","info")
 
                     // Request Switch Binary Report if power suggests switch state has changed:
@@ -525,19 +516,19 @@ def zwaveEvent(hubitat.zwave.commands.meterv3.MeterReport cmd) {
                     break
 
                 case 4:  // Instantaneous Voltage (Volts):
-                    result << createEvent(name: "voltage", value: cmd.scaledMeterValue, unit: "V", displayed: true)
+                    //result << createEvent(name: "voltage", value: cmd.scaledMeterValue, unit: "V", displayed: true)
                     result << createEvent(name: "dispVoltage", value: String.format("%.1f",cmd.scaledMeterValue as BigDecimal) + " V", displayed: false)
                     logger("New meter reading: Instantaneous Voltage: ${cmd.scaledMeterValue} V","info")
                     break
 
                  case 5:  // Instantaneous Current (Amps):
-                    result << createEvent(name: "current", value: cmd.scaledMeterValue, unit: "A", displayed: true)
+                    //result << createEvent(name: "current", value: cmd.scaledMeterValue, unit: "A", displayed: true)
                     result << createEvent(name: "dispCurrent", value: String.format("%.1f",cmd.scaledMeterValue as BigDecimal) + " V", displayed: false)
                     logger("New meter reading: Instantaneous Current: ${cmd.scaledMeterValue} A","info")
                     break
 
                  case 6:  // Instantaneous Power Factor:
-                    result << createEvent(name: "powerFactor", value: cmd.scaledMeterValue, unit: "", displayed: true)
+                    //result << createEvent(name: "powerFactor", value: cmd.scaledMeterValue, unit: "", displayed: true)
                     result << createEvent(name: "dispPowerFactor", value: String.format("%.1f",cmd.scaledMeterValue as BigDecimal), displayed: false)
                     logger("New meter reading: Instantaneous Power Factor: ${cmd.scaledMeterValue}","info")
                     break
@@ -943,13 +934,13 @@ def poll() {
  **/
 def refresh() {
     logger("refresh()","trace")
-    delayBetween([
+    sendCommands([
         zwave.switchBinaryV1.switchBinaryGet().format(),
         zwave.meterV2.meterGet(scale: 0).format(),
         zwave.meterV2.meterGet(scale: 2).format(),
         zwave.configurationV1.configurationGet(parameterNumber: 2) // Wheel Status
     ])
-    sync()
+    //sync()
 }
 
 /*****************************************************************************************************************
@@ -1044,7 +1035,7 @@ def setLocalProtectionMode(localProtectionMode) {
         default:
             logger("setLocalProtectionMode(): Unknown protection mode: ${localProtectionMode}.","warn")
     }
-    sync()
+    //sync()
 }
 
 /**
@@ -1092,7 +1083,7 @@ def setRfProtectionMode(rfProtectionMode) {
         default:
             logger("setRfProtectionMode(): Unknown protection mode: ${rfProtectionMode}.","warn")
     }
-    sync()
+    //sync()
 }
 
 /**
@@ -1220,8 +1211,8 @@ private sync(forceAll = false) {
         state.switchAllModeCache = null
     }
 
-    getParamsMd().findAll( { !it.readonly & (it.fwVersion <= state.fwVersion) } ).each { // Exclude readonly/newer parameters.
-        if ( (state."paramTarget${it.id}" != null) & (state."paramCache${it.id}" != state."paramTarget${it.id}") ) {
+    getParamsMd().findAll( { !it.readonly && (it.fwVersion <= state.fwVersion) } ).each { // Exclude readonly/newer parameters.
+        if ( (state."paramTarget${it.id}" != null) && (state."paramCache${it.id}" != state."paramTarget${it.id}") ) {
             cmds << zwave.configurationV1.configurationSet(parameterNumber: it.id, size: it.size, scaledConfigurationValue: state."paramTarget${it.id}".toInteger())
             cmds << zwave.configurationV1.configurationGet(parameterNumber: it.id)
             logger("sync(): Syncing parameter #${it.id} [${it.name}]: New Value: " + state."paramTarget${it.id}","info")
@@ -1252,8 +1243,8 @@ private sync(forceAll = false) {
         }
     }
 
-    if ( (state.protectLocalTarget != null) & (state.protectRfTarget != null)
-      & ( (state.protectLocalCache != state.protectLocalTarget) || (state.protectRfCache != state.protectRfTarget) ) ) {
+    if ( (state.protectLocalTarget != null) && (state.protectRfTarget != null)
+      && ( (state.protectLocalCache != state.protectLocalTarget) || (state.protectRfCache != state.protectRfTarget) ) ) {
 
         logger("sync(): Syncing Protection State: Local Protection: ${state.protectLocalTarget}, RF Protection: ${state.protectRfTarget}","info")
         cmds << zwave.protectionV2.protectionSet(localProtectionState : state.protectLocalTarget, rfProtectionState: state.protectRfTarget)
@@ -1261,7 +1252,7 @@ private sync(forceAll = false) {
         syncPending++
     }
 
-    if ( (state.switchAllModeTarget != null) & (state.switchAllModeCache != state.switchAllModeTarget) ) {
+    if ( (state.switchAllModeTarget != null) && (state.switchAllModeCache != state.switchAllModeTarget) ) {
         logger("sync(): Syncing SwitchAll Mode: ${state.switchAllModeTarget}","info")
         cmds << zwave.switchAllV1.switchAllSet(mode: state.switchAllModeTarget)
         cmds << zwave.switchAllV1.switchAllGet()
@@ -1281,8 +1272,8 @@ private updateSyncPending() {
 
     def syncPending = 0
 
-    getParamsMd().findAll( { !it.readonly & (it.fwVersion <= state.fwVersion) } ).each { // Exclude readonly/newer parameters.
-        if ( (state."paramTarget${it.id}" != null) & (state."paramCache${it.id}" != state."paramTarget${it.id}") ) {
+    getParamsMd().findAll( { !it.readonly && (it.fwVersion <= state.fwVersion) } ).each { // Exclude readonly/newer parameters.
+        if ( (state."paramTarget${it.id}" != null) && (state."paramCache${it.id}" != state."paramTarget${it.id}") ) {
             syncPending++
         }
     }
@@ -1301,12 +1292,12 @@ private updateSyncPending() {
         syncPending++
     }
 
-    if ( (state.switchAllModeTarget != null) & (state.switchAllModeCache != state.switchAllModeTarget) ) {
+    if ( (state.switchAllModeTarget != null) && (state.switchAllModeCache != state.switchAllModeTarget) ) {
         syncPending++
     }
 
     logger("updateSyncPending(): syncPending: ${syncPending}", "debug")
-    if ((syncPending == 0) & (device.latestValue("syncPending") > 0)) logger("Sync Complete.", "info")
+    if ((syncPending == 0) && (device.latestValue("syncPending") > 0)) logger("Sync Complete.", "info")
     sendEvent(name: "syncPending", value: syncPending, displayed: false)
 }
 
