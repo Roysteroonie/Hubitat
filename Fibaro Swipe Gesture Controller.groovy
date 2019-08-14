@@ -25,7 +25,8 @@ metadata {
 	definition (
 		name: "Fibaro Swipe Gesture Controller", 
 		namespace: "krlaframboise", 
-		author: "Kevin LaFramboise"
+		author: "Kevin LaFramboise",
+		importUrl: "https://raw.githubusercontent.com/Roysteroonie/Hubitat/master/Fibaro%20Swipe%20Gesture%20Controller.groovy"
 	) {
 		capability "Sensor"
 		capability "PushableButton"
@@ -371,7 +372,7 @@ def zwaveEvent(hubitat.zwave.commands.centralscenev1.CentralSceneNotification cm
 	
 	if (gesture) {
 		def status = "${gesture.name} / Button ${gesture.btnNum} Pushed"
-		result << createEvent(createEventMap("button", gesture.btnNum, true, status))
+		result << createEvent(createEventMap("pushed", gesture.btnNum, true, status))
 					
 		result << createEvent(createEventMap("status", status, false))
 		
