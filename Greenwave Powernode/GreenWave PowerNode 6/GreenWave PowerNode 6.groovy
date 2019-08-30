@@ -278,12 +278,11 @@ def pollNodes() {
 }
 
 def pollNode(endpoint)  {
-
-	if (logEnable) log.debug "Polling ${device.label} "
+	if (logEnable) log.debug "Polling ${device.label} node ${endpoint} "
 	def cmds = []
-	cmds << command(encap(zwave.switchBinaryV1.switchBinaryGet(), endpoint))
-	cmds << command(encap(zwave.meterV2.meterGet(scale:0), endpoint))
-	cmds << command(encap(zwave.meterV2.meterGet(scale:2), endpoint))
+	cmds << command(encap(zwave.switchBinaryV1.switchBinaryGet(),endpoint))
+	cmds << command(encap(zwave.meterV2.meterGet(scale:0),endpoint))
+	cmds << command(encap(zwave.meterV2.meterGet(scale:2),endpoint))
 	sendHubCommand(new hubitat.device.HubMultiAction(cmds, hubitat.device.Protocol.ZWAVE))
 }
 
