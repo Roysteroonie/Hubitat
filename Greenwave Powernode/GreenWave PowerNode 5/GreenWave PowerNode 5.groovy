@@ -29,7 +29,7 @@
  *
  *****************************************************************************************************************/
 metadata {
-	definition (name: "GreenWave PowerNode 5", namespace: "copycat73", author: "Nick Veenstra", ocfDeviceType: "oic.d.switch") {
+	definition (name: "GreenWave PowerNode 6", namespace: "copycat73", author: "Nick Veenstra", ocfDeviceType: "oic.d.switch") {
 		capability "Energy Meter"
 		capability "Switch"
 		capability "Power Meter"
@@ -135,6 +135,7 @@ private removeChildDevices(delete) {
 }
 
 def refresh() {
+	log.info "Refresh"
 	pollNodes()
 }
 
@@ -244,7 +245,7 @@ def off6() {
 
 
 void switchOn(Integer node) {
-	log.info "${device.label} On"
+	log.info "${device.label} node ${node} On"
 	def cmds = []
 	cmds << command(encap(zwave.basicV1.basicSet(value: 0xFF), node))
 	cmds << command(encap(zwave.switchBinaryV1.switchBinaryGet(), node))
@@ -252,7 +253,7 @@ void switchOn(Integer node) {
 }
 
 void switchOff(node) {
-	log.info "${device.label} Off"
+	log.info "${device.label} node ${node} Off"
 	def cmds = []
 	cmds << command(encap(zwave.basicV1.basicSet(value: 0x00), node))
 	cmds << command(encap(zwave.switchBinaryV1.switchBinaryGet(), node))
@@ -279,12 +280,11 @@ def pollNodes() {
 }
 
 def pollNode(endpoint)  {
-
-	if (logEnable) log.debug "Polling ${device.label} "
+	if (logEnable) log.debug "Polling ${device.label} node ${endpoint} "
 	def cmds = []
-	cmds << command(encap(zwave.switchBinaryV1.switchBinaryGet(), endpoint))
-	cmds << command(encap(zwave.meterV2.meterGet(scale:0), endpoint))
-	cmds << command(encap(zwave.meterV2.meterGet(scale:2), endpoint))
+	cmds << command(encap(zwave.switchBinaryV1.switchBinaryGet(),endpoint))
+	cmds << command(encap(zwave.meterV2.meterGet(scale:0),endpoint))
+	cmds << command(encap(zwave.meterV2.meterGet(scale:2),endpoint))
 	sendHubCommand(new hubitat.device.HubMultiAction(cmds, hubitat.device.Protocol.ZWAVE))
 }
 
