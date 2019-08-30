@@ -267,6 +267,7 @@ def poll() {
 
 def pollNodes() {
 	if (logEnable) log.debug "Polling Powerstrip - ${device.label} node ${node}"
+	if (txtEnable) log.info "Polling Powerstrip Nodes"
 	def cmds = []
 	for ( i in 1..5 ) { 
 		cmds << command(encap(zwave.switchBinaryV1.switchBinaryGet(), i))
@@ -280,7 +281,7 @@ def pollNodes() {
 }
 
 def pollNode(endpoint)  {
-	if (txtEnable) log.info "Polling Powerstrip node ${endpoint}"
+	if (logEnable) log.debug "Polling Powerstrip node ${endpoint}"
 	def cmds = []
 	cmds << command(encap(zwave.switchBinaryV1.switchBinaryGet(),endpoint))
 	cmds << command(encap(zwave.meterV2.meterGet(scale:0),endpoint))
