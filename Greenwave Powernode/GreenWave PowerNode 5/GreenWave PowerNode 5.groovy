@@ -280,7 +280,7 @@ def pollNodes() {
 }
 
 def pollNode(endpoint)  {
-	if (logEnable) log.debug "Polling ${device.label} node ${endpoint} "
+	if (txtEnable) log.info "Polling Powerstrip node ${endpoint}"
 	def cmds = []
 	cmds << command(encap(zwave.switchBinaryV1.switchBinaryGet(),endpoint))
 	cmds << command(encap(zwave.meterV2.meterGet(scale:0),endpoint))
