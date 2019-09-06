@@ -29,7 +29,7 @@
  *  Updated for HE by @Royski 28/05/19
  *****************************************************************************************************************/
 metadata {
-    definition (name: "GreenWave PowerNode (Single) Advanced - HE", namespace: "codersaur", author: "David Lomas", 
+    definition (name: "GreenWave PowerNode (Single) Advanced", namespace: "codersaur", author: "David Lomas", 
 	importUrl: "https://raw.githubusercontent.com/Roysteroonie/Hubitat/master/GreenWave%20PowerNode%20(Single)%20Advanced%20-%20HE.groovy") {
         capability "Actuator"
         capability "Switch"
@@ -51,8 +51,8 @@ metadata {
 
         // Display Attributes:
         // These are only required because the UI lacks number formatting and strips leading zeros.
-        attribute "dispEnergy", "string"
-        attribute "dispPower", "string"
+        //attribute "dispEnergy", "string"
+        //attribute "dispPower", "string"
 		
 
         // Custom Commands:
@@ -60,12 +60,12 @@ metadata {
         command "reset"                     // Alias for resetEnergy().
         command "resetEnergy"               // Reset accumulated energy figure to 0.
         command "resetFault"                // Reset fault alarm to 'clear'.
-        command "setLocalProtectionMode"    // Set physical protection mode.
-        command "toggleLocalProtectionMode" // Toggle physical protection mode.
-        command "setRfProtectionMode"       // Set wireless protection mode.
-        command "toggleRfProtectionMode"    // Toggle wireless protection mode.
+        //command "setLocalProtectionMode"    // Set physical protection mode.
+        //command "toggleLocalProtectionMode" // Toggle physical protection mode.
+        //command "setRfProtectionMode"       // Set wireless protection mode.
+        //command "toggleRfProtectionMode"    // Toggle wireless protection mode.
         command "sync"                      // Sync configuration with physical device.
-        command "test"                      // Test function.
+        //command "test"                      // Test function.
 		command "ClearStates"				// Clear all device states 
 
         // Fingerprints:
@@ -489,20 +489,20 @@ def zwaveEvent(hubitat.zwave.commands.meterv3.MeterReport cmd) {
         case 1:  // Electric meter:
             switch (cmd.scale) {
                 case 0:  // Accumulated Energy (kWh):
-                    //result << createEvent(name: "energy", value: cmd.scaledMeterValue, unit: "kWh", displayed: true)
-                    result << createEvent(name: "dispEnergy", value: String.format("%.2f",cmd.scaledMeterValue as BigDecimal) + " kWh", unit: "kWh", displayed: true)
+                    result << createEvent(name: "energy", value: (cmd.scaledMeterValue) + " kWh", unit: "kWh", displayed: true)
+                    //result << createEvent(name: "dispEnergy", value: String.format("%.2f",cmd.scaledMeterValue as BigDecimal) + " kWh", unit: "kWh", displayed: true)
                     logger("New meter reading: Accumulated Energy: ${cmd.scaledMeterValue} kWh","info")
                     break
 
                 case 1:  // Accumulated Energy (kVAh):
-                    //result << createEvent(name: "energy", value: cmd.scaledMeterValue, unit: "kVAh", displayed: true)
-                    result << createEvent(name: "dispEnergy", value: String.format("%.2f",cmd.scaledMeterValue as BigDecimal) + " kVAh", unit: "kVAh", displayed: true)
+                    result << createEvent(name: "energy", value: (cmd.scaledMeterValue) + " kVAh", unit: "kVAh", displayed: true)
+                    //result << createEvent(name: "dispEnergy", value: String.format("%.2f",cmd.scaledMeterValue as BigDecimal) + " kVAh", unit: "kVAh", displayed: true)
                     logger("New meter reading: Accumulated Energy: ${cmd.scaledMeterValue} kVAh","info")
                     break
 
                 case 2:  // Instantaneous Power (Watts):
-                    //result << createEvent(name: "power", value: cmd.scaledMeterValue, unit: "W", displayed: true)
-                    result << createEvent(name: "dispPower", value: String.format("%.1f",cmd.scaledMeterValue as BigDecimal) + " W", unit: "W", displayed: true)
+                    result << createEvent(name: "power", value: (cmd.scaledMeterValue) + " W", unit: "W", displayed: true)
+                    //result << createEvent(name: "dispPower", value: String.format("%.1f",cmd.scaledMeterValue as BigDecimal) + " W", unit: "W", displayed: true)
                     logger("New meter reading: Instantaneous Power: ${cmd.scaledMeterValue} W","info")
 
                     // Request Switch Binary Report if power suggests switch state has changed:
@@ -516,20 +516,20 @@ def zwaveEvent(hubitat.zwave.commands.meterv3.MeterReport cmd) {
                     break
 
                 case 4:  // Instantaneous Voltage (Volts):
-                    //result << createEvent(name: "voltage", value: cmd.scaledMeterValue, unit: "V", displayed: true)
-                    result << createEvent(name: "dispVoltage", value: String.format("%.1f",cmd.scaledMeterValue as BigDecimal) + " V", displayed: false)
+                    result << createEvent(name: "voltage", value: (cmd.scaledMeterValue) + " V", unit: "V", displayed: true)
+                   // result << createEvent(name: "dispVoltage", value: String.format("%.1f",cmd.scaledMeterValue as BigDecimal) + " V", displayed: false)
                     logger("New meter reading: Instantaneous Voltage: ${cmd.scaledMeterValue} V","info")
                     break
 
                  case 5:  // Instantaneous Current (Amps):
-                    //result << createEvent(name: "current", value: cmd.scaledMeterValue, unit: "A", displayed: true)
-                    result << createEvent(name: "dispCurrent", value: String.format("%.1f",cmd.scaledMeterValue as BigDecimal) + " V", displayed: false)
+                    result << createEvent(name: "current", value: cmd.scaledMeterValue, unit: "A", displayed: true)
+                    //result << createEvent(name: "dispCurrent", value: String.format("%.1f",cmd.scaledMeterValue as BigDecimal) + " V", displayed: false)
                     logger("New meter reading: Instantaneous Current: ${cmd.scaledMeterValue} A","info")
                     break
 
                  case 6:  // Instantaneous Power Factor:
-                    //result << createEvent(name: "powerFactor", value: cmd.scaledMeterValue, unit: "", displayed: true)
-                    result << createEvent(name: "dispPowerFactor", value: String.format("%.1f",cmd.scaledMeterValue as BigDecimal), displayed: false)
+                    result << createEvent(name: "powerFactor", value: cmd.scaledMeterValue, unit: "", displayed: true)
+                    //result << createEvent(name: "dispPowerFactor", value: String.format("%.1f",cmd.scaledMeterValue as BigDecimal), displayed: false)
                     logger("New meter reading: Instantaneous Power Factor: ${cmd.scaledMeterValue}","info")
                     break
 
@@ -1142,9 +1142,17 @@ private prepCommands(cmds, delay=200) {
  *  Uses encapCommand() to apply security or CRC16 encapsulation as needed.
  **/
 private sendCommands(cmds, delay=200) {
-    //sendHubCommand( cmds.collect{ (it instanceof hubitat.zwave.Command ) ? response(encapCommand(it)) : response(it) }, delay)
-	delayBetween( cmds.collect{ (it instanceof hubitat.zwave.Command ) ? response(encapCommand(it)) : response(it) }, delay)
+///    //sendHubCommand( cmds.collect{ (it instanceof hubitat.zwave.Command ) ? response(encapCommand(it)) : response(it) }, delay)
+///	delayBetween( cmds.collect{ (it instanceof hubitat.zwave.Command ) ? response(encapCommand(it)) : response(it) }, delay)
+///}
+
+def strCmds = cmds.collect{ (it instanceof hubitat.zwave.Command ) ? encapCommand(it).format() : it }
+logger("(Chuck) ${strCmds}","trace")
+def delayCmds = delayBetween(strCmds, delay)
+logger("(Chuck) ${delayCmds}","trace")
+sendHubCommand(new hubitat.device.HubMultiAction(delayCmds, hubitat.device.Protocol.ZWAVE))
 }
+
 
 /**
  *  logger()
@@ -1327,7 +1335,7 @@ private generatePrefsParams() {
                 title: "#${it.id}: ${it.name}: \n" + it.description + lb +"Default Value: ${it.defaultValue}",
                 type: it.type,
                 range: it.range,
-//                defaultValue: it.defaultValue, // iPhone users can uncomment these lines!
+                defaultValue: it.defaultValue, // iPhone users can uncomment these lines!
                 required: it.required
             )
             break
@@ -1338,7 +1346,7 @@ private generatePrefsParams() {
                 title: "#${it.id}: ${it.name}: \n" + it.description + lb + "Default Value: ${it.defaultValue}",
                 type: it.type,
                 options: it.options,
-//                defaultValue: it.defaultValue, // iPhone users can uncomment these lines!
+                defaultValue: it.defaultValue, // iPhone users can uncomment these lines!
                 required: it.required
             )
             break
@@ -1372,7 +1380,7 @@ private generatePrefsAssocGroups() {
                 name: "configAssocGroup${it.id}",
                 title: "Association Group #${it.id}: ${it.name}: \n" + it.description + " \n[MAX NODES: ${it.maxNodes}]",
                 type: "text",
-//                defaultValue: "", // iPhone users can uncomment these lines!
+                defaultValue: "", // iPhone users can uncomment these lines!
                 required: false
             )
         }
