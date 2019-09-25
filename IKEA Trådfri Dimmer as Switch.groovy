@@ -12,11 +12,10 @@
  *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
  *
- *  Updated by Royski to change the clockwise and anti-clockwise to on/off
- *  Added debug options and auto off debug logging.
+ *  Updated by Royski to change the clockwise and anti-clockwise on/off
  */
 metadata {
-	definition (name: "IKEA Trådfri Dimmer 0.2", namespace: "dk.decko", author: "Jonas Laursen") {
+	definition (name: "IKEA Trådfri Dimmer as Switch", namespace: "dk.decko", author: "Jonas Laursen") {
         capability "Sensor"
 		capability "Configuration"
 		capability "Switch"
