@@ -161,7 +161,7 @@ def createChildDevices() {
 		for (i in 1..5) {
 		def node = i as String
 		def devLabel = "Greenwave switch "+node
-		addChildDevice("copycat73", "GreenWave PowerNode 6 Child Device", "${device.deviceNetworkId}-ep${i}", [completedSetup: true, label: devLabel,
+		addChildDevice("copycat73", "GreenWave PowerNode 5 Child Device", "${device.deviceNetworkId}-ep${i}", [completedSetup: true, label: devLabel,
 			isComponent: false, componentName: "switch$i", componentLabel: devLabel])    
 		}
 	} catch (e) {
