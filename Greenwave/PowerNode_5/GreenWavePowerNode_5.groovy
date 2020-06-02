@@ -72,12 +72,10 @@ metadata {
 		command "off4"
 		command "on5"
 		command "off5"
-		//command "on6"
-		//command "off6"
 		command "reset"
 
 		fingerprint inClusters : "0x25,0x32,0x60,0x72,0x86,0x20,0x71,0x70,0x27,0x85,0x87,0x75,0x56"
-		fingerprint mfr:"0099", prod:"0003", model:"0004", deviceJoinName: "GreenWave PowerNode 6"
+		fingerprint mfr:"0099", prod:"0003", model:"0004", deviceJoinName: "GreenWave PowerNode 5"
 		
 	}
 	
@@ -156,8 +154,6 @@ def createChildDevices() {
 	log.debug "creating child devices"
 		
 	try {
-	//Unomment 1..6 line below if a 6 strip, else Uncomment line 1..5 for a 5 strip
-		//for (i in 1..6) {
 		for (i in 1..5) {
 		def node = i as String
 		def devLabel = "Greenwave switch "+node
@@ -236,13 +232,6 @@ def on5() {
 def off5() {
 	switchOff(5)
 }
-def on6() {
-	switchOn(6)
-}
-def off6() {
-	switchOff(6)
-}
-
 
 void switchOn(Integer node) {
 	log.info "${device.label} node ${node} On"
