@@ -155,7 +155,6 @@ def createChildDevices() {
 	log.debug "creating child devices"
 		
 	try {
-	//Unomment 1..6 line below if a 6 strip, else Uncomment line 1..5 for a 5 strip
 		for (i in 1..6) {
 		def node = i as String
 		def devLabel = "Greenwave switch "+node
