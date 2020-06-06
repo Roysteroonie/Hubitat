@@ -98,7 +98,7 @@ def logsOff(){
 
 def parse(String description) {
 	def result = null
-	def cmd = zwave.parse(description)
+	def cmd = zwave.parse(description, [0x60:3])
 	if (cmd) {
 		result = zwaveEvent(cmd)
 		//log.debug "Parsed ${cmd} to ${result.inspect()}"
