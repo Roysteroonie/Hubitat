@@ -27,6 +27,7 @@
  *   for the specific language governing permissions and limitations under the License.
  *
  *  Updated for HE by @Royski 28/05/19
+ *  Added refresh option 27/12/20
  *****************************************************************************************************************/
 metadata {
     definition (name: "GreenWave PowerNode (Single) Advanced", namespace: "codersaur", author: "David Lomas", 
