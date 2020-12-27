@@ -255,6 +255,11 @@ def updated() {
     else {
         logger("updated(): Ran within last 2 seconds so aborting.","debug")
     }
+if (autoPoll) {
+	initialize_poll()
+	} else {
+	unschedule(pollNodes)
+	}
 }
 
 void initialize_poll() {
