@@ -84,11 +84,13 @@ metadata {
 	
 	preferences {
 		// input name:"updateLight", type:"number", title:"After how many minutes the GreenWave device should start flashing if the controller didn't communicate with this device", defaultValue:255
+
+		input "autoPoll", "bool", required: false, title: "Enable Auto Poll"
+			if(autoPoll){
 		input "pollInterval", "enum", title: "Auto Poll Interval:", required: false, defaultValue: "2 Minutes", 
 			options: ["1 Minute", "2 Minutes", "3 Minutes", "4 Minutes", "5 Minutes"]}
-
 		input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true
-        input name: "txtEnable", type: "bool", title: "Enable descriptionText logging", defaultValue: true
+		input name: "txtEnable", type: "bool", title: "Enable descriptionText logging", defaultValue: true
 	}
 	
 }
