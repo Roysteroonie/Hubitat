@@ -30,7 +30,7 @@
  *****************************************************************************************************************/
 metadata {
 	definition (name: "GreenWave PowerNode 5", namespace: "copycat73", author: "Nick Veenstra", ocfDeviceType: "oic.d.switch") {
-		capability "Energy Meter"
+		capability "Energy Meter" 
 		capability "Switch"
 		capability "Power Meter"
 		capability "Polling"
