@@ -27,6 +27,7 @@
  *   30/08/2019 Updated by @Royski to work with Hubitat, with help from @chuck.schwer and @stephack 
  *	 Solution here https://community.hubitat.com/t/parent-child-device-not-actioning-on-off/21694/30?u=royski
  *
+ *  Added refresh option 27/12/20
  *****************************************************************************************************************/
 metadata {
 	definition (name: "GreenWave PowerNode 6", namespace: "copycat73", author: "Nick Veenstra", ocfDeviceType: "oic.d.switch") {
