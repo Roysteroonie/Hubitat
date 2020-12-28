@@ -104,44 +104,27 @@ def logsOff(){
 }
 
 def parse(String description) {
-	def result = null
+//	def result = null
 	def cmd = zwave.parse(description, [0x60:3])
 	if (cmd) {
 		result = zwaveEvent(cmd)
-		//log.debug "Parsed ${cmd} to ${result.inspect()}"
+		if (logEnable) log.debug " New Parsed ${cmd} to ${result.inspect()}"
 	} else {
-		//log.debug "Non-parsed event: ${description}"
+		if (logEnable) log.debug "Non-parsed event: ${description}"
 	}
 	return result
 }
 
 def installed() {
-	log.debug "installed"
+	if (logEnable) log.debug "installed"
 
 	createChildDevices()
 
 	//command(zwave.manufacturerSpecificV1.manufacturerSpecificGet())
 	//command(zwave.configurationV1.configurationSet(configurationValue: [255], parameterNumber: 1, size: 1))
 
-}
 
-void initialize_poll() {
-	if (pollInterval == "1 Minute") {
-	schedule("0 0/1 * 1/1 * ? *", pollNodes)
-	log.info "1 Minute refresh called"
-	} else if (pollInterval == "2 Minutes") {
-	schedule("0 0/2 * 1/1 * ? *", pollNodes)
-	log.info "2 Minute refresh called"
-	} else if (pollInterval == "3 Minutes") {
-	schedule("0 0/3 * 1/1 * ? *", pollNodes)
-	log.info "3 Minute refresh called"
-	} else if (pollInterval == "4 Minutes") {
-	schedule("0 0/4 * 1/1 * ? *", pollNodes)
-	log.info "4 Minute refresh called"
-	} else if (pollInterval == "5 Minutes") {
-	schedule("0 0/5 * 1/1 * ? *", pollNodes)
-	log.info "5 Minute refresh called"
-	}
+
 }
 
 def uninstalled() {
@@ -159,6 +142,7 @@ private removeChildDevices(delete) {
 }
 
 def refresh() {
+	log.info "Refresh"
 	pollNodes()
 }
 
@@ -290,15 +274,15 @@ def off6() {
 
 
 void switchOn(Integer node) {
-	log.info "${device.label} On"
+	log.info "${device.label} node ${node} On"
 	def cmds = []
 	cmds << command(encap(zwave.basicV1.basicSet(value: 0xFF), node))
 	cmds << command(encap(zwave.switchBinaryV1.switchBinaryGet(), node))
 	sendHubCommand(new hubitat.device.HubMultiAction(cmds, hubitat.device.Protocol.ZWAVE))
 }
 
-void switchOff(node) {
-	log.info "${device.label} Off"
+void switchOff(Integer node) {
+	log.info "${device.label} node ${node} Off"
 	def cmds = []
 	cmds << command(encap(zwave.basicV1.basicSet(value: 0x00), node))
 	cmds << command(encap(zwave.switchBinaryV1.switchBinaryGet(), node))
@@ -335,7 +319,7 @@ def pollNode(endpoint)  {
 }
 
 def updateChildLabel(endpoint) {
-	log.debug "update tile label for endpoint $endpoint"
+	if (logEnable) log.debug "update tile label for endpoint $endpoint"
 	// tbd
 }
 
@@ -438,7 +422,7 @@ def zwaveEvent(hubitat.zwave.commands.switchbinaryv1.SwitchBinaryReport cmd, ep=
 	}
 }
 
-def zwaveEvent(hubitat.zwave.commands.meterv3.MeterReport cmd, ep=null)
+def zwaveEvent(hubitat.zwave.commands.meterv1.MeterReport cmd, ep=null)
 {
 	if (logEnable) log.debug "Greenwave v3 meter report received for endpoint $ep scale $cmd.scale value $cmd.scaledMeterValue"
 	def result
@@ -488,4 +472,86 @@ def zwaveEvent(hubitat.zwave.commands.configurationv2.ConfigurationReport cmd) {
 
 def zwaveEvent(hubitat.zwave.commands.multichannelv3.MultiChannelCapabilityReport cmd) {
 	if (logEnable) log.debug "Greenwave v3 multi channel capability report received" 
+}
+
+def zwaveEvent(hubitat.zwave.commands.crc16encapv1.Crc16Encap cmd, ep=null) {
+   def version = cmdVersions()[cmd.commandClass as Integer]
+   def encapsulatedCommand = zwave.getCommand(cmd.commandClass, cmd.command, cmd.data, version)
+   if (encapsulatedCommand) {
+	   if (logEnable) log.debug "${device.displayName} - Parsed Crc16Encap into: ${encapsulatedCommand}"
+      return zwaveEvent(encapsulatedCommand)
+   } else {
+       log.warn "Unable to extract CRC16 command from ${cmd}"
+   }
+}
+
+//def zwaveEvent(hubitat.zwave.commands.crc16encapv1.Crc16Encap cmd) {
+  //log.debug "zwaveEvent(hubitat.zwave.commands.crc16encapv1.Crc16Encap cmd)"
+  //log.trace "cmd: $cmd"
+
+//  def version = commandClasses[cmd.commandClass as int] ?: 1
+
+//  def encapsulatedCommand = zwave.getCommand(cmd.commandClass, cmd.command, cmd.data, version)
+//  if (!encapsulatedCommand) {
+//    log.warn "zwaveEvent(): Could not extract command from ${cmd}"
+//  }
+//  else {
+//    log.Debug "zwaveEvent(): Extracted command ${encapsulatedCommand}"
+//    return zwaveEvent(encapsulatedCommand)
+//  }
+//}
+
+/* def zwaveEvent(hubitat.zwave.commands.crc16encapv1.Crc16Encap cmd) {
+    log.debug "zwaveEvent(): CRC-16 Encapsulation Command received: ${cmd}"
+
+     def versions = getCommandClassVersions()
+     def version = versions[cmd.commandClass as Integer]
+     def ccObj = version ? zwave.commandClass(cmd.commandClass, version) : zwave.commandClass(cmd.commandClass)
+     def encapsulatedCommand = ccObj?.command(cmd.command)?.parse(cmd.data)
+    // TO DO: It should be possible to replace the lines above with this line soon...
+    //def encapsulatedCommand = cmd.encapsulatedCommand(getCommandClassVersions())
+    if (!encapsulatedCommand) {
+        logger("zwaveEvent(): Could not extract command from ${cmd}","error")
+    } else {
+        return zwaveEvent(encapsulatedCommand)
+    }
+} */
+
+private Map cmdVersions() {
+[
+        0x20: 1, // Basic V1
+        0x22: 1, // Application Status V1 (Not advertised but still sent)
+        0x25: 1, // Switch Binary V1
+        0x27: 1, // Switch All V1
+        0x32: 2, // Meter V3
+        0x56: 1, // CRC16 Encapsulation V1
+        0x70: 1, // Configuration V1
+        0x71: 1, // Alarm (Notification) V1
+        0x72: 2, // Manufacturer Specific V2
+        0x75: 2, // Protection V2
+        0x85: 1, // Association V2
+        0x86: 1, // Version V1
+        0x87: 1, // Indicator V1
+		0x60: 3  // COMMAND_CLASS_MULTI_CHANNEL
+
+    ]}
+
+private getCommandClassVersions() {
+    return [
+        0x20: 1, // Basic V1
+        0x22: 1, // Application Status V1 (Not advertised but still sent)
+        0x25: 1, // Switch Binary V1
+        0x27: 1, // Switch All V1
+        0x32: 2, // Meter V3
+        0x56: 1, // CRC16 Encapsulation V1
+        0x70: 1, // Configuration V1
+        0x71: 1, // Alarm (Notification) V1
+        0x72: 2, // Manufacturer Specific V2
+        0x75: 2, // Protection V2
+        0x85: 1, // Association V2
+        0x86: 1, // Version V1
+        0x87: 1, // Indicator V1
+		0x60: 3  // COMMAND_CLASS_MULTI_CHANNEL
+
+    ]
 }
