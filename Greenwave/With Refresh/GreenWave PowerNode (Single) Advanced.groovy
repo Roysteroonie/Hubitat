@@ -1169,9 +1169,9 @@ private sendCommands(cmds, delay=200) {
 ///}
 
 def strCmds = cmds.collect{ (it instanceof hubitat.zwave.Command ) ? encapCommand(it).format() : it }
-if (logEnable) log.debug "(Chuck) ${strCmds}"
+//if (logEnable) log.debug "(Chuck) ${strCmds}"
 def delayCmds = delayBetween(strCmds, delay)
-if (logEnable) log.debug "(Chuck) ${delayCmds}"
+//if (logEnable) log.debug "(Chuck) ${delayCmds}"
 sendHubCommand(new hubitat.device.HubMultiAction(delayCmds, hubitat.device.Protocol.ZWAVE))
 }
 
