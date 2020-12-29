@@ -256,6 +256,12 @@ def updated() {
     else {
         logger("updated(): Ran within last 2 seconds so aborting.","debug")
     }
+    logger("updated(): Call autoPoll.","info")
+    setAutopoll()
+}
+
+def setAutopoll(){
+    logger("setAutopoll(): set poll time.","info")
 if (autoPoll) {
 	initialize_poll()
 	} else {
