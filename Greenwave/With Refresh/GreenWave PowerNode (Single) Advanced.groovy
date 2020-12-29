@@ -955,6 +955,11 @@ def poll() {
     refresh()
 }
 
+def pollNodes() {
+    logger("pollNodes()","trace")
+    refresh()
+}
+
 /**
  *  refresh()                   [Capability: Refresh]
  *
