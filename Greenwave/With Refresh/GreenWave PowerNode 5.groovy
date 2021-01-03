@@ -86,7 +86,7 @@ metadata {
 		input "autoPoll", "bool", required: false, title: "Enable Auto Poll"
 			if(autoPoll){
 		input "pollInterval", "enum", title: "Auto Poll Interval:", required: false, defaultValue: "2 Minutes", 
-			options: ["1 Minute", "2 Minutes", "3 Minutes", "4 Minutes", "5 Minutes"]}
+			options: ["1 Minute", "2 Minutes", "3 Minutes", "4 Minutes", "5 Minutes", "10 Minutes"]}
 		input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true
 		input name: "txtEnable", type: "bool", title: "Enable descriptionText logging", defaultValue: true
 	}
@@ -169,6 +169,9 @@ void initialize_poll() {
 	} else if (pollInterval == "5 Minutes") {
 	schedule("0 0/5 * 1/1 * ? *", pollNodes)
 	log.info "5 Minute refresh called"
+	} else if (pollInterval == "10 Minutes") {
+	schedule("0 0/10 * 1/1 * ? *", pollNodes)
+	log.info "10 Minute refresh called"
 	}
 }
 
