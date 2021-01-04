@@ -1,7 +1,7 @@
 /*****************************************************************************************************************
  *  Copyright: Nick Veenstra
  *
- *  Name: GreenWave PowerNode 6
+ *  Name: GreenWave PowerNode 5
  *
  *  Date: 2018-01-04
  *
