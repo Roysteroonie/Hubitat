@@ -142,10 +142,11 @@ def refresh() {
 	pollNodes()
 }
 
-def updated() {
-	if (logEnable) log.debug "updated called"
-	state.fwVersion = 4.23 // Will be updated if a versionReport is received.
-	if(logEnable){runIn(1800, logsOff)}
+def updated(){
+log.info "Greenwave Parent updated"
+    log.warn "debug logging is: ${logEnable == true}"
+    log.warn "description logging is: ${txtEnable == true}"
+    if (logEnable) runIn(1800,logsOff)
 	if (autoPoll) {
 	initialize_poll()
 	} else {
@@ -425,7 +426,7 @@ def zwaveEvent(hubitat.zwave.commands.meterv1.MeterReport cmd, ep=null)
 	} else {
 		result = [name: "power", value: cmd.scaledMeterValue, unit: "W"]
 	}
-	if (ep) {//
+	if (ep) {
 		def childDevice = childDevices.find{it.deviceNetworkId == "$device.deviceNetworkId-ep$ep"}
 		if (childDevice)
 			childDevice.sendEvent(result)
